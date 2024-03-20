@@ -4,10 +4,29 @@ words_to_replace = []
 
 
 def main():
+    while True:
+        print("(make) to make\n(start) to start quiz\n(q) to quit")
+        command = input(">")
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        if command.lower() == "make":
+            make()
+        elif command.lower() == "start":
+            if len(lists_of_statements) <= 0:
+                main()
+            else:
+                answering()
+        elif command.lower() == "q":
+            quit()
+        else:
+            print(f"\"{command}\" was invalid. Enter a valid command.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+
+def make():
     users_statement = input("Enter your statement:\n")
     users_statements_as_list = users_statement.split()
 
     w_to_replace = input("What word do you want to replace:\n")
+    print("──────────────────────────────")
     words_to_replace.append(w_to_replace)
 
     #   replacing chosen word with underscores
@@ -20,9 +39,7 @@ def main():
             users_statements_as_list.pop(index_of_underscored_word)
             users_statements_as_list.insert(index_of_underscored_word, underscored_word)
             lists_of_statements.append(users_statements_as_list)
-
-    # to display the statement and its missing word
-    answering()
+    main()
 
 
 def answering():
