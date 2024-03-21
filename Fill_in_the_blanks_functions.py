@@ -1,4 +1,3 @@
-replacement_words = []
 lists_of_statements = []
 words_to_replace = []
 
@@ -11,7 +10,7 @@ def main():
         if command.lower() == "make":
             make()
         elif command.lower() == "start":
-            if len(lists_of_statements) <= 0:
+            if len(lists_of_statements) <= 0:  # So that you can't start the quiz without inputting your statements first
                 main()
             else:
                 answering()
@@ -22,41 +21,47 @@ def main():
 
 
 def make():
-    users_statement = input("Enter your statement:\n")
-    users_statements_as_list = users_statement.split()
+    statement = input("Enter your statement:\n")
+    statement_list = statement.split()
 
-    w_to_replace = input("What word do you want to replace:\n")
+    replaced_word = input("What word do you want to replace:\n")
     print("──────────────────────────────")
-    words_to_replace.append(w_to_replace)
+    words_to_replace.append(replaced_word)
 
     #   replacing chosen word with underscores
-    for words in users_statements_as_list:
-        if words == w_to_replace:
+    for words in statement_list:
+        if words == replaced_word:
             underscored_word = len(words) * "_"
-            replacement_words.append(underscored_word)
 
-            index_of_underscored_word = users_statements_as_list.index(words)
-            users_statements_as_list.pop(index_of_underscored_word)
-            users_statements_as_list.insert(index_of_underscored_word, underscored_word)
-            lists_of_statements.append(users_statements_as_list)
+            index = statement_list.index(words)  # Getting index of the word chosen to be replaced
+
+            # removes the chosen word then replaces it with the blank version
+            statement_list.pop(index)
+            statement_list.insert(index, underscored_word)
+            lists_of_statements.append(statement_list)  # adds statement_list to lists_of_statements making a 2D list
     main()
 
 
 def answering():
     score = 0
     total_points = 0
+
+    # displaying statements
     for list_of_statements in lists_of_statements:
         total_points += len(lists_of_statements)
         for words in list_of_statements:
             print(words, end=" ")
-    answer_of_user = input("|Answer: ")
-    for word_to_replace in words_to_replace:
-        if answer_of_user == word_to_replace:
-            print('Correct!!!\n━━━━━━━━━━')
+
+    # once player answers
+    answer = input("|Answer: ")
+    for word_to_replace in words_to_replace:  # checking if answer is correct or wrong
+        if answer == word_to_replace:
+            print('✅\n━━━━━━━━━━')
             score += 1
         else:
-            print("Wrong!!!\n━━━━━━━━━━")
+            print("❌\n━━━━━━━━━━")
     print(f"You got {score}/{total_points}!")
+    # if the player's score is above passing score or not
     if score > total_points / 2:
         print("😁")
     elif total_points / 2 > score > 0:
