@@ -45,30 +45,48 @@ def make():
 def answering():
     score = 0
     total_points = 0
+    joined_statement = " "
 
     # displaying statements
     for list_of_statements in lists_of_statements:
         total_points += len(lists_of_statements)
-        for words in list_of_statements:
-            print(words, end=" ")
+        print(joined_statement.join(list_of_statements))
 
     # once player answers
-    answer = input("|Answer: ")
+    answer = input("Answer: ")
     for word_to_replace in words_to_replace:  # checking if answer is correct or wrong
         if answer == word_to_replace:
-            print('✅\n━━━━━━━━━━')
+            print('✅')
             score += 1
         else:
-            print("❌\n━━━━━━━━━━")
-    print(f"You got {score}/{total_points}!")
+            print("❌")
+
     # if the player's score is above passing score or not
+    print(f"You got {score}/{total_points}!")
     if score > total_points / 2:
-        print("😁")
+        print("😁\n━━━━━━━━━━")
     elif total_points / 2 > score > 0:
-        print("🥲")
+        print("🥲\n━━━━━━━━━━")
     elif score == 0:
-        "DISAPPOINTMENT! 😤"
+        print("DISAPPOINTMENT! 😤\n━━━━━━━━━━")
+
+    ending_choice()  # After all questions have been answered
 
 
+def ending_choice():
+    ending_decision = input("(redo) to redo the set quiz\n(res) to reset quiz\n(q) to quit\n>>")
+    if ending_decision.lower() == "q":
+        quit()
+    elif ending_decision.lower() == "redo":
+        print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        answering()  # uses the previous statements
+    elif ending_decision.lower() == "res":
+        #  clears the lists, allowing a new batch of statements in the quiz
+        lists_of_statements.clear()
+        words_to_replace.clear()
+        main()
+
+
+# this is just a convenience
 if __name__ == '__main__':
     main()
