@@ -5,7 +5,7 @@ words_to_replace = []
 def main():
     while True:
         print("(make) to make\n(start) to start quiz\n(q) to quit")
-        command = input(">")
+        command = input("> ")
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         if command.lower() == "make":
             make()
@@ -39,7 +39,19 @@ def make():
             statement_list.pop(index)
             statement_list.insert(index, underscored_word)
             lists_of_statements.append(statement_list)  # adds statement_list to lists_of_statements making a 2D list
-    main()
+
+    end_of_make()
+
+
+def end_of_make():  # after inputting the statement and the word to be replaced
+    users_choice = input("Do you wish to make another one? (y/n): ")
+    if users_choice.lower() == "y":
+        make()
+    elif users_choice.lower() == "n":
+        main()
+    else:
+        print(f"\"{users_choice}\" is not valid")
+        end_of_make() # #
 
 
 def answering():
@@ -74,7 +86,7 @@ def answering():
 
 
 def ending_choice():
-    ending_decision = input("(redo) to redo the set quiz\n(res) to reset quiz\n(q) to quit\n>>")
+    ending_decision = input("(redo) to redo the set quiz\n(res) to reset quiz\n(q) to quit\n>> ")
     if ending_decision.lower() == "q":
         quit()
     elif ending_decision.lower() == "redo":
