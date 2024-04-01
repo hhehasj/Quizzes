@@ -67,23 +67,25 @@ def answering():
         answer = input("Answer: ")
         total_points += len(lists_of_statements)
 
-        # once player answers
-        for word_to_replace in words_to_replace[count]:  # checking if answer is correct or wrong
-            if answer == word_to_replace:
-                print(word_to_replace, words_to_replace)
-                print('✅')
-                score += 1
-            elif answer != word_to_replace:
-                print("❌")
-
-        # if the player's score is above passing score or not
-        print(f"You got {score}/{total_points}!")
-        if score > total_points / 2:
-            print("😁\n━━━━━━━━━━")
-        elif total_points / 2 > score > 0:
-            print("🥲\n━━━━━━━━━━")
-        elif score == 0:
-            print("DISAPPOINTMENT! 😤\n━━━━━━━━━━")
+        # # once player answers
+        # for word_to_replace in words_to_replace[count]:  # checking if answer is correct or wrong
+        #     if answer == word_to_replace:
+        #         print(word_to_replace, words_to_replace)
+        #         print('✅')
+        #         score += 1
+        #         count += 1
+        #     elif answer != word_to_replace:
+        #         print("❌")
+        #         count += 1
+        #
+        # # if the player's score is above passing score or not
+        # print(f"You got {score}/{total_points}!")
+        # if score > total_points / 2:
+        #     print("😁\n━━━━━━━━━━")
+        # elif total_points / 2 > score > 0:
+        #     print("🥲\n━━━━━━━━━━")
+        # elif score == 0:
+        #     print("DISAPPOINTMENT! 😤\n━━━━━━━━━━")
 
         # ending_choice()  # After all questions have been answered`
 
