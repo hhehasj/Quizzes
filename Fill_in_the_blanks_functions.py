@@ -61,11 +61,25 @@ def answering():
 
     # displaying statements
     for lists in lists_of_statements:
-        for words_to_make_statement in lists:
-            print(words_to_make_statement, end=" ")
+        for i in range(len(lists)):
+            print(lists[i], end=" ")
+            total_points += 1
+        print()
 
         answer = input("Answer: ")
-        total_points += len(lists_of_statements)
+
+        # for iteration in range(len(words_to_replace)):
+        #     print(f"{answer} == {words_to_replace[iteration]}")
+        print(words_to_replace)
+        for word in words_to_replace[count]:
+            print(f"{answer} == {words_to_replace[count]}")
+            if answer == words_to_replace[count]:
+                print("✅")
+                score += 1
+                count += 1
+            elif answer != word:
+                print("❌")
+                count += 1
 
         # # once player answers
         # for word_to_replace in words_to_replace[count]:  # checking if answer is correct or wrong
