@@ -7,25 +7,20 @@ not_ended: bool = True
 
 while not_ended:
     print("―" * 20)
-    choices: str = input("Make questions (que)\n"
-                         "Answers to the questions (ans)\n"
+    choices: str = input("Make questions (make)\n"
                          "Start quiz (start)\n"
                          "Exit (ex)\n> ")
     print("―" * 20)
 
-    if choices == "que" or choices == "Que" or choices == "QUE":
+    if choices == "make" or choices == "Make" or choices == "MAKE":
         while True:
             users_question: str = input("Question: ")
-
             if users_question == "b" or users_question == "B":
                 break
             else:
                 questions.append(users_question)
 
-    elif choices == "ans" or choices == "Ans" or choices == "ANS":
-        while True:
-            users_answer: str = input("Answer to the question: ")
-
+            users_answer: str = input("Answer to the quetion: ")
             if users_answer == "b" or users_answer == "B":
                 break
             else:
