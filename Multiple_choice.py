@@ -90,9 +90,11 @@ while not_ended:
                 else:
                     print("WRONG!")
                     print(f"{answers[question_num]} is the correct answer.")
-                    print("――――――――――――――――――――――――――――")
+                    print("―" * 20)
 
                 question_num += 1
+            not_ended = False
+
         except IndexError:
             print("An error occured")
 
