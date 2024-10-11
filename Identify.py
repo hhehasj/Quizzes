@@ -1,69 +1,121 @@
-questions: list[str] = []
-answers: list[str] = []
-guesses: list[str] = []
-score: int = 0
-question_num: int = 0
-not_ended: bool = True
+import customtkinter as ctk
+from PIL import Image, ImageTk
 
-while not_ended:
-    print("―" * 20)
-    choices: str = input("Make questions (make)\n"
-                         "Start quiz (start)\n"
-                         "Exit (ex)\n> ")
-    print("―" * 20)
-
-    if choices == "make" or choices == "Make" or choices == "MAKE":
-        while True:
-            users_question: str = input("Question: ")
-            if users_question == "b" or users_question == "B":
-                break
-            else:
-                questions.append(users_question)
-
-            users_answer: str = input("Answer to the quetion: ")
-            if users_answer == "b" or users_answer == "B":
-                break
-            else:
-                answers.append(users_answer)
-
-    elif choices == "start" or choices == "Start" or choices == "START":
-        for question in questions:
-            print(question)
-            guess: str = input("Your answer: ")
-            guesses.append(guess)
-
-            if guess == answers[question_num]:
-                print("Correct!")
-                print("―" * 20)
-                score += 1
-            else:
-                print("Wrong")
-                print("―" * 20)
-
-            question_num += 1
-
-        not_ended = False
-
-    elif choices == "ex" or choices == "Ex" or choices == "EX":
-        break
-
+def change_theme():
+    if ctk.get_appearance_mode() == "Light":
+        ctk.set_appearance_mode("dark")
     else:
-        print(f"\033[91m \"{choices}\" is not a valid command.\033[0m")
+        ctk.set_appearance_mode("light")
 
 
-# Scoring system
-print("             Results                     ")
-print("―" * 20)
+root = ctk.CTk()
+root.geometry("750x500")
 
-print("Answers: ", end="|")
-for answer in answers:
-    print(answer, end="|")
-print()
+change_theme_icon = ctk.CTkImage(
+    light_image=Image.open("./icons_and_images/light_to_dark.png"),
+    dark_image=Image.open("./icons_and_images/dark_to_light.png"),
+)
 
-print("Guesses: ", end="|")
-for guess in guesses:
-    print(guess, end="|")
-print()
+down_arrows = ctk.CTkImage(
+    light_image=Image.open("./icons_and_images/black_down_arrow.png"),
+    dark_image=Image.open("./icons_and_images/white_down_arrow.png"),
+)
 
-score = int(score / len(questions) * 100)
-print(f"Your score is: {score}%")
+up_arrows = ctk.CTkImage(
+    light_image=Image.open("./icons_and_images/black_to_white_up_arrow.png"),
+    dark_image=Image.open("./icons_and_images/white_to_black_up_arrow.png"),
+)
+
+change_theme_btn = ctk.CTkButton(
+    root,
+    image=change_theme_icon,
+    text="Change\nTheme",
+    compound="left",
+    text_color=("black", "white"),
+    command=change_theme,
+    corner_radius=10,
+    border_width=2,
+    border_color="black",
+)
+change_theme_btn.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
+
+
+class DropdownAnimation(ctk.CTkFrame):
+    def __init__(self, parent, start_pos, end_pos):
+        super().__init__(master=parent)
+
+        # general attributes
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+
+        # animation logic
+        self.position = start_pos
+        self.in_start_pos = True
+
+        # layout
+        self.configure(fg_color="transparent",
+                       height=125,)
+        self.place(relx=0.5, rely=start_pos, anchor="center", relwidth=0.32)
+
+    def animate(self):
+        if self.in_start_pos:
+            self.animate_forwards()
+        else:
+            self.animate_backwards()
+
+    def animate_forwards(self):
+        if self.position < self.end_pos:
+            self.position += 0.01
+            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
+            self.after(15, self.animate_forwards)
+        else:
+            self.in_start_pos = False
+
+    def animate_backwards(self):
+        if self.position > self.start_pos:
+            self.position -= 0.01
+            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
+            self.after(15, self.animate_backwards)
+        else:
+            self.in_start_pos = True
+
+
+dropdown_frame = DropdownAnimation(root, start_pos=-0.024, end_pos=0.15)
+
+segmented_btn_frame = ctk.CTkFrame(dropdown_frame,
+                                   height=75,
+                                   fg_color="transparent",
+                                   border_width=2,
+                                   border_color=("black", "gray41"),
+                                   corner_radius=10)
+segmented_btn_frame.place(relx=0.5, rely=0.3, relwidth=1, anchor="center")
+
+make_start_buttons = ctk.CTkSegmentedButton(
+    segmented_btn_frame,
+    values=["Make\nQuestions", "Start\nQuiz"],
+    dynamic_resizing=False,
+    height=50,
+    font=("Helvetica", 15, "bold"),
+    border_width=5,
+)
+make_start_buttons.place(relx=0.5, rely=0.5, relwidth=0.88, anchor="center")
+# Sets the width of the buttons in make_start_buttons
+print(make_start_buttons.__dict__)
+for button in make_start_buttons._buttons_dict.values():
+    button.configure(width=200, text_color=("black", "white"))  # Both buttons have equal width
+
+dropdown_button = ctk.CTkButton(
+    dropdown_frame,
+    image=down_arrows,
+    text="",
+    fg_color="transparent",
+    hover_color=("#cccccc", "#1d1d1d"),
+    border_color=("black", "gray41"),
+    border_spacing=4,
+    corner_radius=0,
+    border_width=2,
+    command=dropdown_frame.animate,
+)
+dropdown_button.place(relx=0.5, rely=0.85, relwidth=0.25, anchor="s")
+
+root.mainloop()
