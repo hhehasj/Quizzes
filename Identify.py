@@ -1,11 +1,21 @@
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import Image
+from GUI_ID_extras.Make_Questions import make_questions
+
 
 def change_theme():
     if ctk.get_appearance_mode() == "Light":
         ctk.set_appearance_mode("dark")
     else:
         ctk.set_appearance_mode("light")
+
+
+def segmented_button_callback(event):
+    users_choice = make_start_buttons.get()
+    if users_choice == "Make\nQuestions":
+        make_questions(root)
+    else:
+        print("Start Quiz")
 
 
 root = ctk.CTk()
@@ -43,6 +53,7 @@ change_theme_btn.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
 class DropdownAnimation(ctk.CTkFrame):
     def __init__(self, parent, start_pos, end_pos):
         super().__init__(master=parent)
+        global dropdown_button
 
         # general attributes
         self.start_pos = start_pos
@@ -53,43 +64,53 @@ class DropdownAnimation(ctk.CTkFrame):
         self.in_start_pos = True
 
         # layout
-        self.configure(fg_color="transparent",
-                       height=125,)
-        self.place(relx=0.5, rely=start_pos, anchor="center", relwidth=0.32)
+        self.configure(
+            fg_color="transparent",
+        )
+        self.place(
+            relx=0.5, rely=start_pos, anchor="center", relwidth=0.32, relheight=0.25
+        )
 
     def animate(self):
         if self.in_start_pos:
-            self.animate_forwards()
+            self.animate_down()
         else:
-            self.animate_backwards()
+            self.animate_up()
 
-    def animate_forwards(self):
+    def animate_down(self):
         if self.position < self.end_pos:
             self.position += 0.01
             self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
-            self.after(15, self.animate_forwards)
+            self.after(15, self.animate_down)
+            dropdown_button.configure(image=up_arrows)
         else:
             self.in_start_pos = False
 
-    def animate_backwards(self):
+    def animate_up(self):
         if self.position > self.start_pos:
             self.position -= 0.01
             self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
-            self.after(15, self.animate_backwards)
+            self.after(15, self.animate_up)
+            dropdown_button.configure(image=down_arrows)
         else:
             self.in_start_pos = True
 
 
-dropdown_frame = DropdownAnimation(root, start_pos=-0.024, end_pos=0.15)
+dropdown_frame = DropdownAnimation(root, start_pos=-0.035, end_pos=0.15)
 
-segmented_btn_frame = ctk.CTkFrame(dropdown_frame,
-                                   height=75,
-                                   fg_color="transparent",
-                                   border_width=2,
-                                   border_color=("black", "gray41"),
-                                   corner_radius=10)
-segmented_btn_frame.place(relx=0.5, rely=0.3, relwidth=1, anchor="center")
+segmented_btn_frame = ctk.CTkFrame(
+    dropdown_frame,
+    height=75,
+    fg_color="transparent",
+    border_width=2,
+    border_color=("black", "gray41"),
+    corner_radius=10,
+)
+segmented_btn_frame.place(
+    relx=0.5, rely=0.33, relwidth=1, relheight=0.65, anchor="center"
+)
 
+# this_buttons_variable = ctk.StringVar(value="")
 make_start_buttons = ctk.CTkSegmentedButton(
     segmented_btn_frame,
     values=["Make\nQuestions", "Start\nQuiz"],
@@ -97,12 +118,20 @@ make_start_buttons = ctk.CTkSegmentedButton(
     height=50,
     font=("Helvetica", 15, "bold"),
     border_width=5,
+    fg_color=("#ebebeb", "#242424"),
+    command=segmented_button_callback,
 )
-make_start_buttons.place(relx=0.5, rely=0.5, relwidth=0.88, anchor="center")
+make_start_buttons.place(
+    relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center"
+)
 # Sets the width of the buttons in make_start_buttons
-print(make_start_buttons.__dict__)
 for button in make_start_buttons._buttons_dict.values():
-    button.configure(width=200, text_color=("black", "white"))  # Both buttons have equal width
+    button.configure(
+        width=200,
+        corner_radius=10,
+        text_color=("black", "white"),
+        fg_color=("#c0c0c0", "#c0c0c0"),
+    )  # Both buttons have equal width
 
 dropdown_button = ctk.CTkButton(
     dropdown_frame,
@@ -116,6 +145,6 @@ dropdown_button = ctk.CTkButton(
     border_width=2,
     command=dropdown_frame.animate,
 )
-dropdown_button.place(relx=0.5, rely=0.85, relwidth=0.25, anchor="s")
+dropdown_button.place(relx=0.5, rely=0.91, relwidth=0.25, relheight=0.27, anchor="s")
 
 root.mainloop()
