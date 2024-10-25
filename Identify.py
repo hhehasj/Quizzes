@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
-from GUI_ID_extras.Make_Questions import make_questions
+from extras import Make_Questions, Start_Quiz
 
 
 def change_theme():
@@ -12,10 +12,15 @@ def change_theme():
 
 def segmented_button_callback(event):
     users_choice = make_start_buttons.get()
+
     if users_choice == "Make\nQuestions":
-        make_questions(root)
+        for widget in main_frame.winfo_children():
+            widget.destroy()
+        Make_Questions(main_frame)
     else:
-        print("Start Quiz")
+        for widget in main_frame.winfo_children():
+            widget.destroy()
+        Start_Quiz(main_frame)
 
 
 root = ctk.CTk()
@@ -97,6 +102,9 @@ class DropdownAnimation(ctk.CTkFrame):
 
 
 dropdown_frame = DropdownAnimation(root, start_pos=-0.035, end_pos=0.15)
+main_frame = ctk.CTkFrame(root, fg_color="transparent")
+main_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.75)
+main_frame.lower()
 
 segmented_btn_frame = ctk.CTkFrame(
     dropdown_frame,
