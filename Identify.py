@@ -16,10 +16,12 @@ def segmented_button_callback(event):
     if users_choice == "Make\nQuestions":
         for widget in main_frame.winfo_children():
             widget.destroy()
+        instructions.destroy()
         Make_Questions(main_frame)
     else:
         for widget in main_frame.winfo_children():
             widget.destroy()
+        instructions.destroy()
         Start_Quiz(main_frame)
 
 
@@ -53,6 +55,10 @@ change_theme_btn = ctk.CTkButton(
     border_color="black",
 )
 change_theme_btn.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
+
+instructions = ctk.CTkLabel(root, text="Welcome to my program😁\nFeel free to explore.\n Hope you enjoy it!",
+                            font=("Arial", 50, "bold"))
+instructions.place(relx=0.5, rely=0.5, anchor="center")
 
 
 class DropdownAnimation(ctk.CTkFrame):
@@ -118,7 +124,6 @@ segmented_btn_frame.place(
     relx=0.5, rely=0.33, relwidth=1, relheight=0.65, anchor="center"
 )
 
-# this_buttons_variable = ctk.StringVar(value="")
 make_start_buttons = ctk.CTkSegmentedButton(
     segmented_btn_frame,
     values=["Make\nQuestions", "Start\nQuiz"],

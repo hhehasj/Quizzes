@@ -3,6 +3,7 @@ from PIL import Image
 
 Users_Questions: list[str] = []
 Users_Answers: list[str] = []
+score: int = 0
 
 
 class Make_Questions(ctk.CTkFrame):
@@ -151,7 +152,7 @@ class Start_Quiz(ctk.CTkFrame):
                                           text_color=("black", "white"),
                                           corner_radius=10,
                                           border_color="black",
-                                          border_width=3,)
+                                          border_width=3)
         self.start_button.place(relx=0.5, rely=0.5, anchor="center",
                                 relheight=0.15, relwidth=0.25)
         self.start_button.focus()
@@ -171,6 +172,7 @@ class Start_Quiz(ctk.CTkFrame):
 
         # Variables
         question_num: int = 0
+        decrease_num: int = 1
 
         def next_question():
             nonlocal question_num
@@ -178,35 +180,74 @@ class Start_Quiz(ctk.CTkFrame):
             """"
             Displays the next questions inside the Users_Questions list
             """""
-            if question_num < len(Users_Questions):
-                self.questions_label.configure(state="normal")
-                self.questions_label.delete(0.0, "end")
-                self.questions_label.insert(0.0, f"{question_num + 1}. {Users_Questions[::-1][question_num]}")
-                question_num += 1
-                self.questions_label.configure(state="disabled")
-            else:
+            # moves to the next question
+            try:
+                if question_num <= len(Users_Questions):
+                    checking()
+
+                    self.questions_label.configure(state="normal")
+                    self.questions_label.delete(0.0, "end")
+                    self.questions_label.insert(0.0, f"{question_num + 1}. {Users_Questions[::-1][question_num]}")
+                    question_num += 1
+                    self.questions_label.configure(state="disabled")
+
+            except IndexError:
                 self.questions_label.configure(state="normal")
                 self.questions_label.delete(0.0, "end")
                 self.questions_label.insert(0.0, "Test Over")
                 self.questions_label.configure(state="disabled")
+                self.guess_box.configure(state="disabled")
+                transition()
 
         def checking():
             nonlocal question_num
-            users_guess: str = self.guess_box.get(0.0, "end")
+            global score
+            users_guess: str = self.guess_box.get(0.0, "end").rstrip()
 
-            print(question_num)
-            if question_num > 0:
-                if users_guess.rstrip() == Users_Answers[question_num - 1]:
-                    self.guess_box.delete(0.0, "end")
-                    self.status_btn = ctk.CTkLabel(self, image=correct_icon, text="", font=("Helvetica", 20, "bold"))
-                    self.status_btn.place(relx=0.5, rely=0.7, anchor="center")
-                    question_num -= 1
-                else:
-                    self.guess_box.delete(0.0, "end")
-                    self.status_btn.configure(image=wrong_icon)
-                    question_num -= 1
+            if users_guess != "" and users_guess == Users_Answers[::-1][question_num - 1]:
+                self.guess_box.delete(0.0, "end")
+                self.status_label.configure(image=correct_icon)
+                score += 1
 
+            elif users_guess != "" and users_guess != Users_Answers[::-1][question_num - 1]:
+                self.guess_box.delete(0.0, "end")
+                self.status_label.configure(image=wrong_icon)
 
+            else:
+                self.guess_box.insert(0.0, "You didn't type your answer.")
+                question_num -= 1
+
+        def show_results():
+            for Start_Quiz_widgets in self.winfo_children():
+                Start_Quiz_widgets.place_forget()
+
+            Results(parent=self.master)
+
+        def transition():
+            next_questions_info = self.next_question_btn.place_info()
+            x_relpos = float(next_questions_info["relx"])
+            next_width = float(next_questions_info["relwidth"])
+
+            if x_relpos >= 0.35:
+                x_relpos -= 0.01
+                self.next_question_btn.place_configure(relx=x_relpos)
+                self.after(20, transition)
+
+            elif next_width >= 0.25:
+                next_width -= 0.01
+                self.next_question_btn.place_configure(relwidth=next_width)
+                self.after(20, transition)
+
+            else:
+                self.results_btn = ctk.CTkButton(self, text="Results",
+                                                 font=("Helvetica", 20, "bold"),
+                                                 text_color=("black", "white"),
+                                                 corner_radius=10,
+                                                 border_color="black",
+                                                 border_width=3,
+                                                 command=show_results)
+                self.results_btn.place(relx=0.65, rely=0.7, anchor="center",
+                                       relwidth=0.25, relheight=0.1)
 
         """"
         Displays the questions and shows an answer box.
@@ -244,6 +285,9 @@ class Start_Quiz(ctk.CTkFrame):
             self.guess_box.place(relx=0.57, rely=0.44, anchor="center",
                                  relwidth=0.35, relheight=0.16)
 
+            # STATUS BOX
+            self.status_label = ctk.CTkLabel(self, image=None, text="", font=("Helvetica", 20, "bold"))
+            self.status_label.place(relx=0.5, rely=0.6, anchor="center")
 
             self.next_question_btn = ctk.CTkButton(self,
                                                    text="Next",
@@ -252,12 +296,80 @@ class Start_Quiz(ctk.CTkFrame):
                                                    corner_radius=10,
                                                    border_color="black",
                                                    border_width=3,
-                                                   command=lambda: [next_question(), checking()],
+                                                   command=next_question
                                                    )
-            self.next_question_btn.place(relx=0.5, rely=0.8, anchor="center",
+            self.next_question_btn.place(relx=0.5, rely=0.7, anchor="center",
                                          relwidth=0.25, relheight=0.1)
+        # IF USER HASN'T ENTERED ANY QUESTIONS IN MAKE QUESTIONS
         except IndexError:
             self.error_label = ctk.CTkLabel(self, text="You haven't entered any questions.\nPlease go to Make Questions.",
                                             font=("Helvetica", 35, "bold"),
                                             text_color=("black", "white"))
             self.error_label.place(relx=0.5, rely=0.5, anchor="center")
+
+
+class Results(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master=parent)
+
+        # Frame configuration
+        self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
+        self.configure(fg_color=("#ebebeb", "#808080"))
+
+        # WIDGETS
+        self.percentage_label = ctk.CTkLabel(self, text=f"{score / len(Users_Questions) * 100:.2f}%",
+                                             font=("Helvetica", 65, "bold"),
+                                             text_color="black")
+        self.percentage_label.place(relx=0.5, rely=0.2, anchor="center")
+
+        self.score_label = ctk.CTkLabel(self, text=f"{score}/{len(Users_Questions)}",
+                                        font=("Helvetica", 45, "bold"),
+                                        text_color="black")
+        self.score_label.place(relx=0.5, rely=0.4, anchor="center")
+
+        # Buttons
+        self.retake_button = ctk.CTkButton(self, text="RETAKE",
+                                           font=("Helvetica", 25, "bold"),
+                                           text_color=("black", "white"),
+                                           border_width=3,
+                                           corner_radius=10,
+                                           border_color="black",
+                                           border_spacing=10,
+                                           command=self.retake)
+
+        self.summary_button = ctk.CTkButton(self, text="SUMMARY",
+                                            font=("Helvetica", 25, "bold"),
+                                            text_color=("black", "white"),
+                                            border_width=3,
+                                            corner_radius=10,
+                                            border_color="black",
+                                            border_spacing=10)
+
+        self.new_quiz_button = ctk.CTkButton(self, text="NEW QUIZ",
+                                             font=("Helvetica", 25, "bold"),
+                                             text_color=("black", "white"),
+                                             border_width=3,
+                                             corner_radius=10,
+                                             border_color="black",
+                                             border_spacing=10,
+                                             command=self.new_quiz)
+
+        self.retake_button.place(relx=0.25, rely=0.6, anchor="center",)
+        self.summary_button.place(relx=0.5, rely=0.6, anchor="center",)
+        self.new_quiz_button.place(relx=0.75, rely=0.6, anchor="center",)
+    def retake(self):
+        global score
+        score = 0
+
+        self.place_forget()
+        Start_Quiz(parent=self.master)
+
+    def new_quiz(self):
+        global score
+        score = 0
+
+        self.place_forget()
+        Users_Questions.clear()
+        Users_Answers.clear()
+
+
