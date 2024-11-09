@@ -91,7 +91,7 @@ class DropdownAnimation(ctk.CTkFrame):
     def animate_down(self):
         if self.position < self.end_pos:
             self.position += 0.01
-            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
+            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32, relheight=0.25)
             self.after(15, self.animate_down)
             dropdown_button.configure(image=up_arrows)
         else:
@@ -100,7 +100,7 @@ class DropdownAnimation(ctk.CTkFrame):
     def animate_up(self):
         if self.position > self.start_pos:
             self.position -= 0.01
-            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32)
+            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32, relheight=0.25)
             self.after(15, self.animate_up)
             dropdown_button.configure(image=down_arrows)
         else:

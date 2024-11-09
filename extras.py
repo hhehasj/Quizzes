@@ -3,6 +3,7 @@ from PIL import Image
 
 Users_Questions: list[str] = []
 Users_Answers: list[str] = []
+Users_Guess: list[str] = []
 score: int = 0
 
 
@@ -203,6 +204,7 @@ class Start_Quiz(ctk.CTkFrame):
             nonlocal question_num
             global score
             users_guess: str = self.guess_box.get(0.0, "end").rstrip()
+            Users_Guess.append(users_guess)
 
             if users_guess != "" and users_guess == Users_Answers[::-1][question_num - 1]:
                 self.guess_box.delete(0.0, "end")
@@ -312,9 +314,21 @@ class Results(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent)
 
+        # def do_something_to_hide_btn():
+        #     ...
+        def show_summary():
+            summary_page.animate()
+            if summary_page.in_start_pos:
+                self.hide_button.place(relx=0.5, rely=0.85, anchor="center", relwidth=0.2, relheight=0.1)
+            else:
+                self.hide_button.place_forget()
+
         # Frame configuration
         self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
         self.configure(fg_color=("#ebebeb", "#808080"))
+
+        # Refactor later
+        summary_page = Summary(parent=self.master, start_pos=1.5, end_pos=0.4)
 
         # WIDGETS
         self.percentage_label = ctk.CTkLabel(self, text=f"{score / len(Users_Questions) * 100:.2f}%",
@@ -343,7 +357,8 @@ class Results(ctk.CTkFrame):
                                             border_width=3,
                                             corner_radius=10,
                                             border_color="black",
-                                            border_spacing=10)
+                                            border_spacing=10,
+                                            command=show_summary)
 
         self.new_quiz_button = ctk.CTkButton(self, text="NEW QUIZ",
                                              font=("Helvetica", 25, "bold"),
@@ -354,15 +369,31 @@ class Results(ctk.CTkFrame):
                                              border_spacing=10,
                                              command=self.new_quiz)
 
-        self.retake_button.place(relx=0.25, rely=0.6, anchor="center",)
-        self.summary_button.place(relx=0.5, rely=0.6, anchor="center",)
-        self.new_quiz_button.place(relx=0.75, rely=0.6, anchor="center",)
+        self.retake_button.place(relx=0.263, rely=0.6, anchor="center", relwidth=0.2, relheight=0.1)
+        self.summary_button.place(relx=0.5, rely=0.6, anchor="center", relwidth=0.23, relheight=0.1)
+        self.new_quiz_button.place(relx=0.75, rely=0.6, anchor="center", relwidth=0.23, relheight=0.1)
+
+        # Hide summary button
+        self.hide_button = ctk.CTkButton(self, text="HIDE",
+                                         font=("Helvetica", 23, "bold"),
+                                         corner_radius=10,
+                                         border_color="black",
+                                         border_spacing=10,
+                                         border_width=3,
+                                         text_color=("black", "white"),
+                                         command=show_summary
+                                         )
+        # self.hide_button.place(relx=0.5, rely=0.85, anchor="center", relwidth=0.2, relheight=0.1)
+
     def retake(self):
         global score
         score = 0
 
         self.place_forget()
         Start_Quiz(parent=self.master)
+
+    # def show_summary(self):
+    #     self.summary_page.animate()
 
     def new_quiz(self):
         global score
@@ -371,5 +402,48 @@ class Results(ctk.CTkFrame):
         self.place_forget()
         Users_Questions.clear()
         Users_Answers.clear()
+        self.after_msg = ctk.CTkLabel(self.master, text="Go to Make Questions\nto enter your new questions.",
+                                      font=("Helvetica", 35, "bold"),
+                                      text_color=("black", "white"))
+        self.after_msg.place(relx=0.5, rely=0.5, anchor="center")
 
+
+class Summary(ctk.CTkFrame):
+    def __init__(self, parent, start_pos: float, end_pos: float):
+        super().__init__(master=parent)
+
+        # Attributes
+        self.start_pos: float = start_pos
+        self.end_pos: float = end_pos
+
+        # Frame configuration
+        self.configure(fg_color=("#e1e1e1", "#eeeeee"))
+        self.place(relx=0.5, rely=start_pos, anchor="center", relwidth=0.8, relheight=0.65)
+
+        # Animation attributes
+        self.position = start_pos
+        self.in_start_pos: bool = True
+
+    # Animation Logic
+    def animate(self):
+        if self.in_start_pos:
+            self.animate_up()
+        else:
+            self.animate_down()
+
+    def animate_up(self):
+        if self.position > self.end_pos:
+            self.position -= 0.1
+            self.place_configure(rely=self.position)
+            self.after(20, self.animate_up)
+        else:
+            self.in_start_pos = False
+
+    def animate_down(self):
+        if self.position < self.start_pos:
+            self.position += 0.1
+            self.place_configure(rely=self.position)
+            self.after(20, self.animate_down)
+        else:
+            self.in_start_pos = True
 
