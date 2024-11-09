@@ -314,20 +314,20 @@ class Results(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent)
 
-        # def do_something_to_hide_btn():
-        #     ...
         def show_summary():
             summary_page.animate()
             if summary_page.in_start_pos:
                 self.hide_button.place(relx=0.5, rely=0.85, anchor="center", relwidth=0.2, relheight=0.1)
+                self.acronym_guide.place(relx=0.75, rely=0.85, anchor="center", relwidth=0.3, relheight=0.2)
             else:
                 self.hide_button.place_forget()
+                self.acronym_guide.place_forget()
 
         # Frame configuration
         self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
         self.configure(fg_color=("#ebebeb", "#808080"))
 
-        # Refactor later
+        # Instance of Summary()
         summary_page = Summary(parent=self.master, start_pos=1.5, end_pos=0.4)
 
         # WIDGETS
@@ -383,17 +383,18 @@ class Results(ctk.CTkFrame):
                                          text_color=("black", "white"),
                                          command=show_summary
                                          )
-        # self.hide_button.place(relx=0.5, rely=0.85, anchor="center", relwidth=0.2, relheight=0.1)
+        self.acronym_guide = ctk.CTkLabel(self, text="G: Guess\nCA: Correct Answer",
+                                          font=("Helvetica", 16, "bold"),
+                                          text_color=("black", "white"),
+                                          )
 
     def retake(self):
         global score
         score = 0
 
         self.place_forget()
+        Users_Guess.clear()
         Start_Quiz(parent=self.master)
-
-    # def show_summary(self):
-    #     self.summary_page.animate()
 
     def new_quiz(self):
         global score
@@ -402,6 +403,7 @@ class Results(ctk.CTkFrame):
         self.place_forget()
         Users_Questions.clear()
         Users_Answers.clear()
+        Users_Guess.clear()
         self.after_msg = ctk.CTkLabel(self.master, text="Go to Make Questions\nto enter your new questions.",
                                       font=("Helvetica", 35, "bold"),
                                       text_color=("black", "white"))
@@ -418,32 +420,52 @@ class Summary(ctk.CTkFrame):
 
         # Frame configuration
         self.configure(fg_color=("#e1e1e1", "#eeeeee"))
-        self.place(relx=0.5, rely=start_pos, anchor="center", relwidth=0.8, relheight=0.65)
+        self.place(relx=0.5, rely=start_pos, anchor="center", relwidth=0.8, relheight=0.7)
 
         # Animation attributes
         self.position = start_pos
         self.in_start_pos: bool = True
 
+        # WIDGETS
+        self.quiz_summary_box = ctk.CTkTextbox(self, font=("Helvetica", 15, "bold"),
+                                               text_color=("black", "white"),
+                                               border_width=3,
+                                               border_color="black",
+                                               border_spacing=5,
+                                               wrap="word",
+                                               )
+        self.quiz_summary_box.place(relx=0.5, rely=0.5, anchor="center",
+                                    relwidth=0.9, relheight=0.85)
+
     # Animation Logic
     def animate(self):
+        def animate_up():
+            if self.position > self.end_pos:
+                self.position -= 0.1
+                self.place_configure(rely=self.position)
+                self.after(20, animate_up)
+            else:
+                self.display_summary()
+                self.in_start_pos = False
+
+        def animate_down():
+            if self.position < self.start_pos:
+                self.position += 0.1
+                self.place_configure(rely=self.position)
+                self.after(20, animate_down)
+            else:
+                self.quiz_summary_box.delete("1.0", "end")
+                self.in_start_pos = True
+
         if self.in_start_pos:
-            self.animate_up()
+            animate_up()
         else:
-            self.animate_down()
+            animate_down()
 
-    def animate_up(self):
-        if self.position > self.end_pos:
-            self.position -= 0.1
-            self.place_configure(rely=self.position)
-            self.after(20, self.animate_up)
-        else:
-            self.in_start_pos = False
-
-    def animate_down(self):
-        if self.position < self.start_pos:
-            self.position += 0.1
-            self.place_configure(rely=self.position)
-            self.after(20, self.animate_down)
-        else:
-            self.in_start_pos = True
-
+    def display_summary(self):
+        for question_num, question in enumerate(Users_Questions[::-1]):
+            self.quiz_summary_box.insert("end", f"{question_num + 1}. {question}\n")
+            self.quiz_summary_box.insert("end", f"G --> {Users_Guess[question_num]}\n")
+            self.quiz_summary_box.insert("end", f"CA --> {Users_Answers[::-1][question_num]}\n")
+            self.quiz_summary_box.insert("end", "―" * 20 + "\n")
+            self.quiz_summary_box.configure(state="disabled")
