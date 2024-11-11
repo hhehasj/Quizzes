@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from extras import Make_Questions, Start_Quiz
+import extras
 
 
 def change_theme():
@@ -23,6 +24,13 @@ def segmented_button_callback(event):
             widget.destroy()
         instructions.destroy()
         Start_Quiz(main_frame)
+
+
+def disable_enable():
+    if extras.get_pressed():
+        make_start_buttons.configure(state="disabled")
+    else:
+        make_start_buttons.configure(state="normal")
 
 
 root = ctk.CTk()
@@ -56,8 +64,11 @@ change_theme_btn = ctk.CTkButton(
 )
 change_theme_btn.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
 
-instructions = ctk.CTkLabel(root, text="Welcome to my program😁\nFeel free to explore.\n Hope you enjoy it!",
-                            font=("Arial", 50, "bold"))
+instructions = ctk.CTkLabel(
+    root,
+    text="Welcome to my program😁\nFeel free to explore.\n Hope you enjoy it!",
+    font=("Arial", 50, "bold"),
+)
 instructions.place(relx=0.5, rely=0.5, anchor="center")
 
 
@@ -82,7 +93,7 @@ class DropdownAnimation(ctk.CTkFrame):
             relx=0.5, rely=start_pos, anchor="center", relwidth=0.32, relheight=0.25
         )
 
-    def animate(self):
+    def animate(self, event):
         if self.in_start_pos:
             self.animate_down()
         else:
@@ -91,7 +102,13 @@ class DropdownAnimation(ctk.CTkFrame):
     def animate_down(self):
         if self.position < self.end_pos:
             self.position += 0.01
-            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32, relheight=0.25)
+            self.place(
+                relx=0.5,
+                rely=self.position,
+                anchor="center",
+                relwidth=0.32,
+                relheight=0.25,
+            )
             self.after(15, self.animate_down)
             dropdown_button.configure(image=up_arrows)
         else:
@@ -100,7 +117,13 @@ class DropdownAnimation(ctk.CTkFrame):
     def animate_up(self):
         if self.position > self.start_pos:
             self.position -= 0.01
-            self.place(relx=0.5, rely=self.position, anchor="center", relwidth=0.32, relheight=0.25)
+            self.place(
+                relx=0.5,
+                rely=self.position,
+                anchor="center",
+                relwidth=0.32,
+                relheight=0.25,
+            )
             self.after(15, self.animate_up)
             dropdown_button.configure(image=down_arrows)
         else:
@@ -156,8 +179,9 @@ dropdown_button = ctk.CTkButton(
     border_spacing=4,
     corner_radius=0,
     border_width=2,
-    command=dropdown_frame.animate,
+    command=disable_enable
 )
 dropdown_button.place(relx=0.5, rely=0.91, relwidth=0.25, relheight=0.27, anchor="s")
+dropdown_button.bind("<Button-1>", dropdown_frame.animate)
 
 root.mainloop()
