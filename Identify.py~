@@ -2,7 +2,6 @@ import customtkinter as ctk
 from PIL import Image
 import extras_FB
 
-
 def change_theme():
     if ctk.get_appearance_mode() == "Light":
         ctk.set_appearance_mode("dark")
@@ -18,23 +17,15 @@ def wwhat_user_chose(event):
             widget.destroy()
 
         greeting_message.destroy()
-        # Make_Questions(main_frame)
-
-    else:
-        for widget in main_frame.winfo_children():
-            widget.destroy()
-
-        greeting_message.destroy()
-        # Start_Quiz(main_frame)
+        Start_Quiz(main_frame)
 
 
 def disable_enable():
-    print("hello")
-    # if extras_FB.get_start_button_pressed():
-    #     Make_Start_buttons.configure(state="disabled")
-    #
-    # else:
-    #     Make_Start_buttons.configure(state="normal")
+    if extras_FB.get_start_button_pressed():
+        Make_Start_buttons.configure(state="disabled")
+
+    else:
+        Make_Start_buttons.configure(state="normal")
 
 
 root = ctk.CTk()
@@ -72,11 +63,10 @@ change_theme_button.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
 
 greeting_message = ctk.CTkLabel(
     root,
-    text="Welcome to my program😁\nFeel free to explore\nHope you enjoy it!",
+    text="Welcome to my program😁\nFeel free to explorev\nHope you enjoy it!",
     font=("Arial", 50, "bold")
 )
 greeting_message.place(relx=0.5, rely=0.5, anchor="center")
-
 
 class DropdownAnimation(ctk.CTkFrame):
     def __init__(self, parent, start_position: float, end_position: float):
@@ -128,6 +118,7 @@ main_frame.lower()
 
 segmented_button_frame = ctk.CTkFrame(
     dropdown_frame,
+    height=75,
     fg_color="transparent",
     border_width=2,
     border_color=("black", "gray41"),
@@ -139,6 +130,7 @@ Make_Start_buttons = ctk.CTkSegmentedButton(
     segmented_button_frame,
     values=["Make\nStatements", "Start\nQuiz"],
     dynamic_resizing=False,
+    height=50,
     font=("Helvetica", 15, "bold"),
     border_width=5,
     fg_color=("#ebebeb", "#242424"),
