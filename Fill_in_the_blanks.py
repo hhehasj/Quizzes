@@ -10,15 +10,15 @@ def change_theme():
         ctk.set_appearance_mode("light")
 
 
-def wwhat_user_chose(event):
+def what_user_chose(event):
     users_choice = Make_Start_buttons.get()
 
-    if users_choice == "Make\nQuestions":
+    if users_choice == "Make\nStatements":
         for widget in main_frame.winfo_children():  # Destroys any widget inside main_frame
             widget.destroy()
 
         greeting_message.destroy()
-        # Make_Questions(main_frame)
+        extras_FB.Make_Statements(main_frame)
 
     else:
         for widget in main_frame.winfo_children():
@@ -142,7 +142,7 @@ Make_Start_buttons = ctk.CTkSegmentedButton(
     font=("Helvetica", 15, "bold"),
     border_width=5,
     fg_color=("#ebebeb", "#242424"),
-    command=wwhat_user_chose
+    command=what_user_chose
 )
 Make_Start_buttons.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
 # Sets the width of the buttons inside Make_Start_buttons
