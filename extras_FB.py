@@ -3,8 +3,8 @@ from PIL import Image
 from tkinter.messagebox import showerror
 
 # Global Variables
-Users_Statements: list[str] = []
-Users_Blanks: list[str] = []
+User_Statements: list[str] = []
+Users_Answers: list[str] = []
 Users_Guess: list[str] = []
 score: int = 0
 start_button_pressed: bool = False
@@ -23,13 +23,13 @@ def get_start_button_pressed():
 class Make_Statements(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent)
+        statement_num: int = 0
 
         def stores_and_displays():
             """
             Displays the output of the statements that will be used in the quiz.
             Then the other textboxes will be empty.
             """""
-
             if self.statements_textbox.get(1.0, "end") == "\n" and self.chosen_word_textbox.get(1.0, "end") == "\n":
                 showerror(title="Empty field", message="Both textboxes are empty.")
 
@@ -37,53 +37,57 @@ class Make_Statements(ctk.CTkFrame):
                 showerror(title="Empty field", message="One of the textboxes is empty.")
 
             else:
-                users_statements: list[str] = store_statements()
-                statement_with_blank: list[str] = statement_to_blank()
+                nonlocal statement_num
+                to_be_displayed_statements, final_statements = revise_statement()
 
-                for number, statement in enumerate(users_statements):
+                for index, statement in enumerate(to_be_displayed_statements):
                     self.preview_box.configure(state="normal")
 
-                    self.preview_box.insert("end", f"{statement}\n")
-                    Users_Statements.append(statement)
+                    self.preview_box.insert("end", f"{statement_num + 1}. {statement}\n")
 
-                    self.preview_box.insert("end", f"{statement_with_blank[number]}\n")
-                    Users_Blanks.append(statement_with_blank[number])
+                    self.preview_box.insert("end", f"{statement_num + 1}. {final_statements[index]}\n")
+                    User_Statements.append(final_statements[statement_num])
 
                     self.preview_box.insert("end", "―" * 15 + "\n")
+                    statement_num += 1
 
                 self.preview_box.configure(state="disabled")
 
                 self.statements_textbox.delete(0.0, "end")
                 self.chosen_word_textbox.delete(0.0, "end")
 
-        def store_statements() -> list[str]:
-            statements: list[str] = []
-            users_input: str = self.statements_textbox.get("1.0", "end")
+        def revise_statement():
+            def removing_excess_characters():
+                users_statement: str = self.statements_textbox.get(1.0, "end")
+                users_chosen_word: str = self.chosen_word_textbox.get(1.0, "end")
+                
+                users_statement.replace("\t", "")
+                users_statement: list[str] = users_statement.splitlines()  # splits statements from \n
+                users_chosen_word.replace("\t", "")
+                users_chosen_word: list[str] = users_chosen_word.splitlines()
 
-            users_input = users_input.replace("\t", "")
-            users_input: list[str] = users_input.splitlines()
+                return users_statement, users_chosen_word
 
-            for statement in users_input:
-                statements.append(statement)
-            return statements
+            revised_initial_statement, revised_chosen_word = removing_excess_characters()
+            final_statements: list[str] = []
+            displayed_statements: list[str] = []
 
-        def statement_to_blank() -> list[str]:
-            new_statement: list[str] = []
-            initial_statement: str = self.statements_textbox.get(1.0, "end")
-            chosen_word: str = self.chosen_word_textbox.get(1.0, "end")
+            for index, statement in enumerate(revised_initial_statement):
+                if statement.find(revised_chosen_word[index]) != -1:
+                    final_statements.append(statement.replace(revised_chosen_word[index], "_" * len(revised_chosen_word[index])))
+                    displayed_statements.append(statement)
+                    Users_Answers.append(revised_chosen_word[index])
 
-            initial_statement = initial_statement.replace("\t", "")
-            statements_list: list[str] = initial_statement.splitlines()
-            chosen_word = chosen_word.replace("\t", "")
-            chosen_words_list: list[str] = chosen_word.splitlines()
-
-            for index, statement in enumerate(statements_list):
-                if statement.find(chosen_words_list[index]) != -1:
-                    new_statement.append(statement.replace(chosen_words_list[index], "_" * len(chosen_words_list[index])))
                 else:
-                    showerror(title="Word not found", message="The word you chose is not in the statement.")
+                    showerror(title="Error", message="The word you want to turn into a blank is not in the statement.")
 
-            return new_statement
+            if len(final_statements) != len(revised_initial_statement):  # so that a statement will not sneak pass through.
+                final_statements.clear()
+                displayed_statements.clear()
+                Users_Answers.clear()
+
+            else:
+                return displayed_statements, final_statements
 
         # Frame's configuration
         self.configure(fg_color=("#ebebeb", "#808080"))
