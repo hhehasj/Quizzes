@@ -11,7 +11,7 @@ def change_theme():
 
 
 def what_user_chose(event):
-    users_choice = Make_Start_buttons.get()
+    users_choice = Make_Start_btn.get()
 
     if users_choice == "Make\nStatements":
         for widget in main_frame.winfo_children():  # Destroys any widget inside main_frame
@@ -25,11 +25,11 @@ def what_user_chose(event):
             widget.destroy()
 
         greeting_message.destroy()
-        # Start_Quiz(main_frame)
+        extras_FB.Start_Quiz(main_frame)
 
 
-def disable_enable():
-    print("hello")
+# def disable_enable():
+#     print("hello")
     # if extras_FB.get_start_button_pressed():
     #     Make_Start_buttons.configure(state="disabled")
     #
@@ -57,7 +57,7 @@ up_arrow = ctk.CTkImage(
 )
 
 # WIDGETS
-change_theme_button = ctk.CTkButton(
+change_theme_btn = ctk.CTkButton(
     root,
     image=change_theme_icon,
     text="Change\nTheme",
@@ -68,7 +68,7 @@ change_theme_button = ctk.CTkButton(
     border_color="black",
     command=change_theme
 )
-change_theme_button.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
+change_theme_btn.place(relx=0.085, rely=0.95, relwidth=0.15, anchor="center")
 
 greeting_message = ctk.CTkLabel(
     root,
@@ -81,7 +81,7 @@ greeting_message.place(relx=0.5, rely=0.5, anchor="center")
 class DropdownAnimation(ctk.CTkFrame):
     def __init__(self, parent, start_position: float, end_position: float):
         super().__init__(master=parent)
-        global dropdown_button
+        global dropdown_btn
 
         # GENERAL ATTRIBUTES
         self.start_position = start_position
@@ -98,26 +98,31 @@ class DropdownAnimation(ctk.CTkFrame):
     def animate(self, event):  # allows the frame to move up or down when dropdown_button is pressed
         if self.in_start_position:
             self.animate_down()
+
         else:
             self.animate_up()
 
     def animate_down(self):
         if self.position < self.end_position:
+
             self.position += 0.01
             self.place_configure(rely=self.position)
             self.after(15, self.animate_down)
-            dropdown_button.configure(image=up_arrow)
+            dropdown_btn.configure(image=up_arrow)
+
         else:
             self.in_start_position = False
 
     def animate_up(self):
         if self.position > self.start_position:
+
             self.position -= 0.01
             self.place_configure(rely=self.position)
             self.after(15, self.animate_up)
-            dropdown_button.configure(image=down_arrow)
+            dropdown_btn.configure(image=down_arrow)
+
         else:
-            self.in_start_position = False
+            self.in_start_position = True
 
 
 # FRAMES
@@ -126,17 +131,17 @@ main_frame = ctk.CTkFrame(root, fg_color="transparent")  # frame that holds Make
 main_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.75)
 main_frame.lower()
 
-segmented_button_frame = ctk.CTkFrame(
+segmented_btn_frame = ctk.CTkFrame(
     dropdown_frame,
     fg_color="transparent",
     border_width=2,
     border_color=("black", "gray41"),
     corner_radius=10
 )
-segmented_button_frame.place(relx=0.5, rely=0.33, relwidth=1, relheight=0.65, anchor="center")
+segmented_btn_frame.place(relx=0.5, rely=0.33, relwidth=1, relheight=0.65, anchor="center")
 
-Make_Start_buttons = ctk.CTkSegmentedButton(
-    segmented_button_frame,
+Make_Start_btn = ctk.CTkSegmentedButton(
+    segmented_btn_frame,
     values=["Make\nStatements", "Start\nQuiz"],
     dynamic_resizing=False,
     font=("Helvetica", 15, "bold"),
@@ -144,9 +149,9 @@ Make_Start_buttons = ctk.CTkSegmentedButton(
     fg_color=("#ebebeb", "#242424"),
     command=what_user_chose
 )
-Make_Start_buttons.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
+Make_Start_btn.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
 # Sets the width of the buttons inside Make_Start_buttons
-for button in Make_Start_buttons._buttons_dict.values():  # Accesses the dictionary of buttons
+for button in Make_Start_btn._buttons_dict.values():  # Accesses the dictionary of buttons
     button.configure(
         width=200,
         corner_radius=10,
@@ -154,7 +159,7 @@ for button in Make_Start_buttons._buttons_dict.values():  # Accesses the diction
         fg_color="#c0c0c0"
     )  # both buttons now have equal width
 
-dropdown_button = ctk.CTkButton(
+dropdown_btn = ctk.CTkButton(
     dropdown_frame,
     image=down_arrow,
     text="",
@@ -164,9 +169,9 @@ dropdown_button = ctk.CTkButton(
     border_spacing=4,
     border_color=("black", "gray41"),
     corner_radius=0,
-    command=disable_enable
+    # command=disable_enable
 )
-dropdown_button.place(relx=0.5, rely=0.91, relwidth=0.25, relheight=0.27, anchor="s")
-dropdown_button.bind("<Button-1>", dropdown_frame.animate)
+dropdown_btn.place(relx=0.5, rely=0.91, relwidth=0.25, relheight=0.27, anchor="s")
+dropdown_btn.bind("<Button-1>", dropdown_frame.animate)
 
 root.mainloop()
