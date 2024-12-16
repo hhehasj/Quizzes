@@ -11,13 +11,13 @@ start_button_pressed: bool = False
 
 
 # allows me to change the boolean value of start_button_pressed to disable or enable Make_Start_buttons
-# def quiz_started(value: bool):
-#     global start_button_pressed
-#     start_button_pressed = value
-#
-#
-# def get_start_button_pressed():
-#     return start_button_pressed
+def quiz_started(value: bool):
+    global start_button_pressed
+    start_button_pressed = value
+
+
+def get_start_button_pressed():
+    return start_button_pressed
 
 
 class Make_Statements(ctk.CTkFrame):
@@ -197,7 +197,7 @@ class Start_Quiz(ctk.CTkFrame):
 
         # Variables
         question_num: int = 0
-        # quiz_started(True)
+        quiz_started(True)
 
         def next_statement():
             nonlocal question_num
@@ -344,6 +344,7 @@ class Start_Quiz(ctk.CTkFrame):
                 text_color=("black", "white"),
             )
             self.error_label.place(relx=0.5, rely=0.5, anchor="center")
+            quiz_started(False)
 
 
 class Results(ctk.CTkFrame):
@@ -458,7 +459,7 @@ class Results(ctk.CTkFrame):
     def new_quiz(self):
         global score
         score = 0
-        # quiz_started(False)
+        quiz_started(False)
 
         self.place_forget()  # removes everything then after_msg will be placed
 

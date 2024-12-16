@@ -11,7 +11,7 @@ def change_theme():
 
 
 def what_user_chose(event):
-    users_choice = Make_Start_btn.get()
+    users_choice = Make_Start_btns.get()
 
     if users_choice == "Make\nStatements":
         for widget in main_frame.winfo_children():  # Destroys any widget inside main_frame
@@ -28,13 +28,12 @@ def what_user_chose(event):
         extras_FB.Start_Quiz(main_frame)
 
 
-# def disable_enable():
-#     print("hello")
-    # if extras_FB.get_start_button_pressed():
-    #     Make_Start_buttons.configure(state="disabled")
-    #
-    # else:
-    #     Make_Start_buttons.configure(state="normal")
+def disable_enable():
+    if extras_FB.get_start_button_pressed():
+        Make_Start_btns.configure(state="disabled")
+
+    else:
+        Make_Start_btns.configure(state="normal")
 
 
 root = ctk.CTk()
@@ -140,7 +139,7 @@ segmented_btn_frame = ctk.CTkFrame(
 )
 segmented_btn_frame.place(relx=0.5, rely=0.33, relwidth=1, relheight=0.65, anchor="center")
 
-Make_Start_btn = ctk.CTkSegmentedButton(
+Make_Start_btns = ctk.CTkSegmentedButton(
     segmented_btn_frame,
     values=["Make\nStatements", "Start\nQuiz"],
     dynamic_resizing=False,
@@ -149,9 +148,9 @@ Make_Start_btn = ctk.CTkSegmentedButton(
     fg_color=("#ebebeb", "#242424"),
     command=what_user_chose
 )
-Make_Start_btn.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
+Make_Start_btns.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
 # Sets the width of the buttons inside Make_Start_buttons
-for button in Make_Start_btn._buttons_dict.values():  # Accesses the dictionary of buttons
+for button in Make_Start_btns._buttons_dict.values():  # Accesses the dictionary of buttons
     button.configure(
         width=200,
         corner_radius=10,
@@ -169,7 +168,7 @@ dropdown_btn = ctk.CTkButton(
     border_spacing=4,
     border_color=("black", "gray41"),
     corner_radius=0,
-    # command=disable_enable
+    command=disable_enable
 )
 dropdown_btn.place(relx=0.5, rely=0.91, relwidth=0.25, relheight=0.27, anchor="s")
 dropdown_btn.bind("<Button-1>", dropdown_frame.animate)
