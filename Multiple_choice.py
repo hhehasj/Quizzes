@@ -10,8 +10,15 @@ def change_theme():
         ctk.set_appearance_mode("light")
 
 
-def what_user_chose():
-    print("Fixing Make Questions and Start_Quiz")
+def what_user_chose(event):
+    users_choice = Make_Start_btns.get()
+
+    if users_choice == "Make\nQuestions":
+        for widget in main_frame.winfo_children():
+            widget.destroy()
+
+        greeting_message.destroy()
+        extras_MC.Make_Questions(main_frame)
 
 
 def disable_enable():
@@ -109,7 +116,7 @@ class DropdownAnimation(ctk.CTkFrame):
 # FRAMES
 dropdown_frame = DropdownAnimation(root, start_position=-0.035, end_position=0.15)
 main_frame = ctk.CTkFrame(root, fg_color="transparent")  # frame that holds Make_Statements and Start_Quiz
-main_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.85, relheight=0.75)
+main_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.95, relheight=0.75)
 main_frame.lower()
 
 segmented_btn_frame = ctk.CTkFrame(
@@ -128,7 +135,7 @@ Make_Start_btns = ctk.CTkSegmentedButton(
     font=("Helvetica", 15, "bold"),
     border_width=5,
     fg_color=("#ebebeb", "#242424"),
-    command=what_user_chose
+    command=what_user_chose,
 )
 Make_Start_btns.place(relx=0.5, rely=0.5, relwidth=0.88, relheight=0.6, anchor="center")
 # Sets the width of the buttons inside Make_Start_buttons
