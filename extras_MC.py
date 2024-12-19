@@ -27,9 +27,10 @@ class Make_Questions(ctk.CTkFrame):
             users_questions = self.questions_textbox.get(0.0, "end").splitlines()
             users_answers = self.answers_textbox.get(0.0, "end").upper()
             users_choices = self.choices_textbox.get(0.0, "end").splitlines()
+            error = 0
 
-            if users_questions != [""] and users_answers != "\n" and users_choices != [""]:
-
+            if users_questions != [""] and users_answers != "\n" and users_choices != [
+                ""]:  # There is an invisible \n character at the end of every string, and [""] is empty for .splitlines()
                 for question in users_questions:
                     Users_Questions.append(question)
                     self.questions_textbox.delete(0.0, "end")
@@ -37,11 +38,13 @@ class Make_Questions(ctk.CTkFrame):
                 for answer in users_answers.replace("\n", "").split(", "):
 
                     if answer == "A" or answer == "B" or answer == "C" or answer == "D":
-                        Users_Answers.append(answer.upper().replace("\n", ""))
+                        Users_Answers.append(answer)
                         self.answers_textbox.delete(0.0, "end")
 
                     else:
-                        showerror(title="Requirement Unfulfilled", message="Only A, B, C, D is allowed. No other letter or character.")
+                        error += 1
+                        showerror(title="Requirement Unfulfilled",
+                                  message="Only A, B, C, D is allowed. No other letter or character.")
                         Users_Questions.pop()
 
                 for choice in users_choices:
@@ -52,17 +55,20 @@ class Make_Questions(ctk.CTkFrame):
                         self.choices_textbox.delete(0.0, "end")
 
                     else:
+                        error += 1
                         showerror(title="Requirement Unfulfilled", message="The Choices field requires 4 choices only.")
-                        Users_Questions.pop()
+
+                        # If 2 errors occur at the same time
+                        if error > 1:
+                            error = 1
+
+                        else:
+                            Users_Questions.pop()
 
             else:
                 showerror(title="Empty Field", message="Please fill in all fields :)")
 
-            print(Users_Questions)
-            print(Users_Answers)
-            print(Users_Choices)
-
-        def show_preview():
+        def show_preview():  # If there is an existing window, the current window is destroyed then replaced with a new & updated one
             if self.window_existence:
                 self.preview_window.destroy()
 
@@ -143,7 +149,7 @@ class Make_Questions(ctk.CTkFrame):
             corner_radius=10,
             border_width=2,
             border_color="black",
-            command= store_questions_answers_choices
+            command=store_questions_answers_choices
         )
         self.enter_btn.place(relx=0.873, rely=0.65, anchor="center", relwidth=0.2, relheight=0.1)
 
@@ -181,28 +187,21 @@ class Make_Questions(ctk.CTkFrame):
                 )
                 self.preview_textbox.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.95, relheight=0.95)
 
-                # Entering questions, choices, and answers into textbox
-                # try:
+                # Displaying
                 for question_number, question in enumerate(Users_Questions):
                     self.preview_textbox.configure(state="normal")
 
                     self.preview_textbox.insert("end", f"{question_number + 1}. {question}\n")
 
                     for letters_index, letter in enumerate(letters):
-                        self.preview_textbox.insert("end", f"{letter}. {Users_Choices[question_number][letters_index]}\n")
+                        self.preview_textbox.insert("end",
+                                                    f"{letter}. {Users_Choices[question_number][letters_index]}\n")
 
                     self.preview_textbox.insert("end", f'Ans: {Users_Answers[question_number]}\n')
 
                     self.preview_textbox.insert("end", "―" * 20 + "\n")
 
                     self.preview_textbox.configure(state="disabled")
-
-                # except IndexError:
-                #     showerror(title="Requirement Unfulfilled", message="The Choices field requires 4 choices only.")
-                #     Users_Questions.pop()
-                #     Users_Choices.pop()
-                #     Users_Answers.pop()
-
 
 
 class Start_Quiz(ctk.CTkFrame):
