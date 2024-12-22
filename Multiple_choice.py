@@ -20,6 +20,13 @@ def what_user_chose(event):
         greeting_message.destroy()
         extras_MC.Make_Questions(main_frame)
 
+    else:
+        for widget in main_frame.winfo_children():
+            widget.destroy()
+
+        greeting_message.destroy()
+        extras_MC.Start_Quiz(main_frame)
+
 
 def disable_enable():
     print("Created later on")
