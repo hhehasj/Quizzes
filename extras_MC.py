@@ -26,22 +26,24 @@ class Make_Questions(ctk.CTkFrame):
 
         def store_questions_answers_choices():
 
-            def questions(questions):
+            def questions():
                 for question in users_questions:
                     Users_Questions.append(question)
                     self.questions_textbox.delete(0.0, "end")
 
-            def answers(answers):
-                for answer in answers.replace("\n", "").split(", "):
-                    Users_Answers.append(answer)
-                    self.answers_textbox.delete(0.0, "end")
+            def answers():
+                for answer in users_answers.replace("\n", "").split(", "):
+                    if answer == "A" or answer == "B" or answer == "C" or answer == "D":
+                        Users_Answers.append(answer)
+                        self.answers_textbox.delete(0.0, "end")
 
-            def choices(choices):
+            def choices():
                 for choice in users_choices:
                     one_group_of_choices: list[str] = choice.split(", ")
 
-                    Users_Choices.append(one_group_of_choices)
-                    self.choices_textbox.delete(0.0, "end")
+                    if len(one_group_of_choices) == 4:
+                        Users_Choices.append(one_group_of_choices)
+                        self.choices_textbox.delete(0.0, "end")
 
             users_questions = self.questions_textbox.get(0.0, "end").splitlines()
             users_answers = self.answers_textbox.get(0.0, "end").upper()
@@ -49,26 +51,16 @@ class Make_Questions(ctk.CTkFrame):
 
             if users_questions != [""] and users_answers != "\n" and users_choices != [""]:  # There is an invisible \n character at the end of every string, and [""] is empty for .splitlines()
 
-                for answer in users_answers.replace("\n", "").split(", "):
-                    if answer == "A" or answer == "B" or answer == "C" or answer == "D":
+                questions()
 
-                        for choice in users_choices:
-                            one_group_of_choices: list[str] = choice.split(", ")
+                answers()
 
-                            if len(one_group_of_choices) == 4:
-                                questions(users_questions)
-                                answers(users_answers)
-                                choices(users_choices)
-
-                            else:
-                                showerror(title="Unfulfilled Requirement", message="Please enter 4 choices only")
-
-                    else:
-                        showerror(title="Unfulfilled Requirement", message="Answers must be A, B, C or D")
+                choices()
 
                 print(Users_Questions)
                 print(Users_Answers)
                 print(Users_Choices)
+
         def show_preview():  # If there is an existing window, the current window is destroyed then replaced with a new & updated one
             if self.window_existence:
                 self.preview_window.destroy()
@@ -226,6 +218,83 @@ class Start_Quiz(ctk.CTkFrame):
         self.start_btn.place(relx=0.5, rely=0.5, anchor="center")
 
     def start(self):
+        def next_question():
+            try:
+                checking()
+
+                self.Questions_display.configure(state="normal")
+                self.Questions_display.delete(0.0, "end")
+
+                self.Questions_display.insert(0.0, f"{question_num + 1}. {Users_Questions[question_num]}")
+
+                self.Questions_display.configure(state="disabled")
+
+            except IndexError:
+                self.Questions_display.configure(state="normal")
+                self.Questions_display.delete(0.0, "end")
+
+                self.Questions_display.insert(0.0, "Test Over")
+
+                self.Questions_display.configure(state="disabled")
+                self.next_btn.configure(state="disabled")
+                transition()
+
+        def checking():
+            nonlocal question_num
+            global score
+            question_num += 1
+
+            if users_guess.get() == Users_Answers[question_num - 1]:
+                self.status_label.configure(image=correct_icon)
+                score += 1
+
+            elif users_guess.get() != Users_Answers[question_num - 1]:
+                self.status_label.configure(image=wrong_icon)
+
+            else:
+                showerror(title="You didn't choose one", message="Please choose!")
+
+            self.Questions_display.configure(state='normal')
+            self.Questions_display.delete(0.0, "end")
+
+            self.Questions_display.insert(0.0, f"{question_num + 1}. {Users_Questions[question_num]}")
+
+            self.Questions_display.configure(state='disabled')
+
+            self.first_radio_btn.configure(text=f"{letters[0]}. {Users_Choices[question_num][0]}")
+            self.second_radio_btn.configure(text=f"{letters[1]}. {Users_Choices[question_num][1]}")
+            self.third_radio_btn.configure(text=f"{letters[2]}. {Users_Choices[question_num][2]}")
+            self.fourth_radio_btn.configure(text=f"{letters[3]}. {Users_Choices[question_num][3]}")
+
+        def show_results():
+            for Start_Quiz_widgets in self.winfo_children():
+                Start_Quiz_widgets.place_forget()
+
+            Results(parent=self.master)
+
+        def transition():
+            # Gets relative position and width of the next_question_btn
+            next_questions_info = self.next_btn.place_info()
+            x_relpos = float(next_questions_info["relx"])
+
+            if x_relpos >= 0.35:  # Moves the button to the left
+                x_relpos -= 0.01
+                self.next_btn.place_configure(relx=x_relpos)
+                self.after(20, transition)
+
+            else:
+                self.results_btn = ctk.CTkButton(
+                    self,
+                    text="Results",
+                    font=("Helvetica", 20, "bold"),
+                    text_color=("black", "white"),
+                    corner_radius=10,
+                    border_width=3,
+                    border_color="black",
+                    command=show_results
+                )
+                self.results_btn.place(relx=0.65, rely=0.835, anchor="center", relwidth=0.2, relheight=0.1)
+
         # Images
         correct_icon = ctk.CTkImage(
             light_image=Image.open("./icons_and_images/check.png"),
@@ -239,45 +308,53 @@ class Start_Quiz(ctk.CTkFrame):
 
         # Variables
         question_num: int = 0
+        letters: tuple[str, str, str, str] = ("A", "B", "C", "D")
 
         for widget in self.winfo_children():
             widget.place_forget()
 
         try:
-            self.Statements_display = ctk.CTkTextbox(
+            self.Questions_display = ctk.CTkTextbox(
                 self,
                 font=("Helvetica", 24, "bold"),
                 fg_color=("#ebebeb", "808080"),
                 text_color=("black", "white"),
                 wrap="word"
             )
-            self.Statements_display.insert(0.0, f"{question_num + 1}. {Users_Questions[question_num]}")
-            question_num += 1
-            self.Statements_display.configure(state="disabled")
-            self.Statements_display.place(relx=0.5, rely=0.2, anchor="center", relwidth=0.5, relheight=0.2)
+            self.Questions_display.insert(0.0, f"{question_num + 1}. {Users_Questions[question_num]}")
+            self.Questions_display.configure(state="disabled")
+            self.Questions_display.place(relx=0.5, rely=0.2, anchor="center", relwidth=0.5, relheight=0.2)
 
+            users_guess = ctk.StringVar(value="")
             self.first_radio_btn = ctk.CTkRadioButton(
                 self,
-                text="First"
+                text=f"{letters[0]}. {Users_Choices[question_num][0]}",
+                variable=users_guess,
+                value=letters[0]
             )
             self.first_radio_btn.place(relx=0.35, rely=0.45, anchor="center")
 
-
             self.second_radio_btn = ctk.CTkRadioButton(
                 self,
-                text="Second"
+                text=f"{letters[1]}. {Users_Choices[question_num][1]}",
+                variable=users_guess,
+                value=letters[1]
             )
             self.second_radio_btn.place(relx=0.35, rely=0.65, anchor="center")
 
             self.third_radio_btn = ctk.CTkRadioButton(
                 self,
-                text="Third"
+                text=f"{letters[2]}. {Users_Choices[question_num][2]}",
+                variable=users_guess,
+                value=letters[2]
             )
             self.third_radio_btn.place(relx=0.675, rely=0.45, anchor="center")
 
             self.fourth_radio_btn = ctk.CTkRadioButton(
                 self,
-                text="Fourth"
+                text=f"{letters[3]}. {Users_Choices[question_num][3]}",
+                variable=users_guess,
+                value=letters[3]
             )
             self.fourth_radio_btn.place(relx=0.675, rely=0.65, anchor="center")
 
@@ -289,8 +366,17 @@ class Start_Quiz(ctk.CTkFrame):
                 corner_radius=10,
                 border_color="black",
                 border_width=2,
+                command=next_question
             )
             self.next_btn.place(relx=0.485, rely=0.835, anchor="center", relwidth=0.2, relheight=0.1)
+
+            self.status_label = ctk.CTkLabel(
+                 self,
+                 image=None,
+                 text="",
+                 font=("Helvetica", 20, "bold")
+            )
+            self.status_label.place(relx=0.485, rely=0.735, anchor="center")
 
         except IndexError:
             self.error_label = ctk.CTkLabel(
