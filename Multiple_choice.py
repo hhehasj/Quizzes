@@ -29,8 +29,11 @@ def what_user_chose(event):
 
 
 def disable_enable():
-    print("Created later on")
+    if extras_MC.get_start_btn_pressed():
+        Make_Start_btns.configure(state="disabled")
 
+    else:
+        Make_Start_btns.configure(state="normal")
 
 root = ctk.CTk()
 root.geometry("750x500")

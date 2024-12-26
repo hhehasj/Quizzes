@@ -72,7 +72,7 @@ class Make_Questions(ctk.CTkFrame):
         self.window_existence: bool = False
 
         # Frame's configuration
-        self.configure(fg_color=("#ebebeb", "808080"))
+        self.configure(fg_color=("#ebebeb", "#808080"))
         self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
         # WIDGETS
@@ -201,7 +201,7 @@ class Start_Quiz(ctk.CTkFrame):
         super().__init__(master=parent)
 
         # Configuration
-        self.configure(fg_color=("#ebebeb", "808080"))
+        self.configure(fg_color=("#ebebeb", "#808080"))
         self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
         # WIDGETS
@@ -242,17 +242,20 @@ class Start_Quiz(ctk.CTkFrame):
         def checking():
             nonlocal question_num
             global score
-            question_num += 1
 
-            if users_guess.get() == Users_Answers[question_num - 1]:
+            question_num += 1
+            Users_Guess.append(users_guess.get())
+
+            if users_guess.get() != "" and users_guess.get() == Users_Answers[question_num - 1]:
                 self.status_label.configure(image=correct_icon)
                 score += 1
 
-            elif users_guess.get() != Users_Answers[question_num - 1]:
+            elif users_guess.get() != "" and users_guess.get() != Users_Answers[question_num - 1]:
                 self.status_label.configure(image=wrong_icon)
 
             else:
                 showerror(title="You didn't choose one", message="Please choose!")
+                question_num -= 1
 
             self.Questions_display.configure(state='normal')
             self.Questions_display.delete(0.0, "end")
@@ -309,6 +312,7 @@ class Start_Quiz(ctk.CTkFrame):
         # Variables
         question_num: int = 0
         letters: tuple[str, str, str, str] = ("A", "B", "C", "D")
+        quiz_started(True)
 
         for widget in self.winfo_children():
             widget.place_forget()
@@ -317,7 +321,7 @@ class Start_Quiz(ctk.CTkFrame):
             self.Questions_display = ctk.CTkTextbox(
                 self,
                 font=("Helvetica", 24, "bold"),
-                fg_color=("#ebebeb", "808080"),
+                fg_color=("#ebebeb", "#808080"),
                 text_color=("black", "white"),
                 wrap="word"
             )
@@ -393,7 +397,197 @@ class Results(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent)
 
+        def show_summary():
+            summary_page.animate()
+            if summary_page.in_start_position:
+                self.hide_btn.place(
+                    relx=0.5, rely=0.85, anchor="center", relwidth=0.2, relheight=0.1
+                )
+                self.acronym_guide.place(
+                    relx=0.75, rely=0.85, anchor="center", relwidth=0.25, relheight=0.15
+                )
+            else:
+                self.hide_btn.place_forget()
+                self.acronym_guide.place_forget()
+
+        # Frame configuration
+        self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
+        self.configure(fg_color=("#ebebeb", "#808080"))
+
+        # Instance of Summary()
+        summary_page = Summary(parent=self.master, start_position=1.5, end_position=0.4)
+
+        # WIDGETS
+        self.score_label = ctk.CTkLabel(
+            self,
+            text=f"{score}/{len(Users_Questions)}",
+            font=("Helvetica", 50, "bold"),
+            text_color="black",
+        )
+        self.score_label.place(relx=0.5, rely=0.3, anchor="center")
+
+        self.percentage_label = ctk.CTkLabel(
+            self,
+            text=f"{score / len(Users_Questions) * 100:.2f}%",
+            font=("Helvetica", 65, "bold"),
+            text_color="black",
+        )
+        self.percentage_label.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Buttons
+        self.retake_btn = ctk.CTkButton(
+            self,
+            text="RETAKE",
+            font=("Helvetica", 25, "bold"),
+            text_color=("black", "white"),
+            border_width=3,
+            corner_radius=10,
+            border_color="black",
+            border_spacing=10,
+            command=self.retake,
+        )
+
+        self.summary_btn = ctk.CTkButton(
+            self,
+            text="SUMMARY",
+            font=("Helvetica", 25, "bold"),
+            text_color=("black", "white"),
+            border_width=3,
+            corner_radius=10,
+            border_color="black",
+            border_spacing=10,
+            command=show_summary,
+        )
+
+        self.new_quiz_btn = ctk.CTkButton(
+            self,
+            text="NEW QUIZ",
+            font=("Helvetica", 25, "bold"),
+            text_color=("black", "white"),
+            border_width=3,
+            corner_radius=10,
+            border_color="black",
+            border_spacing=10,
+            command=self.new_quiz,
+        )
+
+        self.retake_btn.place(relx=0.263, rely=0.7, anchor="center", relwidth=0.2, relheight=0.13)
+        self.summary_btn.place(relx=0.5, rely=0.7, anchor="center", relwidth=0.23, relheight=0.13)
+        self.new_quiz_btn.place(relx=0.75, rely=0.7, anchor="center", relwidth=0.23, relheight=0.13)
+
+        # Hide summary button
+        self.hide_btn = ctk.CTkButton(
+            self,
+            text="HIDE",
+            font=("Helvetica", 23, "bold"),
+            corner_radius=10,
+            border_color="black",
+            border_spacing=10,
+            border_width=3,
+            text_color=("black", "white"),
+            command=show_summary,
+        )
+
+        self.acronym_guide = ctk.CTkLabel(
+            self,
+            text="G: Guess\nCA: Correct Answer",
+            font=("Helvetica", 16, "bold"),
+            text_color=("black", "white"),
+        )
+
+    def retake(self):
+        global score
+        score = 0
+
+        Users_Guess.clear()
+        Start_Quiz(parent=self.master)
+
+    def new_quiz(self):
+        global score
+        score = 0
+        quiz_started(False)
+
+        self.place_forget()  # removes everything then after_msg will be placed
+
+        Users_Questions.clear()
+        Users_Answers.clear()
+        Users_Choices.clear()
+        Users_Guess.clear()
+
+        self.after_msg = ctk.CTkLabel(self.master,
+                                      text="Go to Make Questions\nto enter your new questions.",
+                                      font=("Helvetica", 35, "bold"),
+                                      text_color=("black", "white"), )
+        self.after_msg.place(relx=0.5, rely=0.5, anchor="center")
+
 
 class Summary(ctk.CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, start_position: float, end_position: float):
         super().__init__(master=parent)
+
+        # Attributes
+        self.start_position: float = start_position
+        self.end_position: float = end_position
+
+        # Frame configuration
+        self.configure(fg_color=("#e1e1e1", "#eeeeee"))
+        self.place(relx=0.5, rely=start_position, anchor="center", relwidth=0.8, relheight=0.7)
+
+        # Animation attributes
+        self.position = start_position
+        self.in_start_position: bool = True
+
+        # WIDGETS
+        self.quiz_summary_box = ctk.CTkTextbox(
+            self,
+            font=("Helvetica", 15, "bold"),
+            text_color=("black", "white"),
+            border_width=3,
+            border_color="black",
+            border_spacing=5,
+            wrap="word"
+        )
+        self.quiz_summary_box.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.9, relheight=0.85)
+
+    def animate(self):
+        def animate_up():
+            if self.position > self.end_position:
+                self.position -= 0.05
+                self.place_configure(rely=self.position)
+                self.after(15, animate_up)
+
+            else:
+                self.display_summary()
+                self.in_start_position = False
+
+        def animate_down():
+            if self.position < self.start_position:
+                self.position += 0.05
+                self.place_configure(rely=self.position)
+                self.after(15, animate_down)
+
+            else:
+                self.quiz_summary_box.delete(1.0, "end")
+                self.in_start_position = True
+
+        if self.in_start_position:
+            animate_up()
+        else:
+            animate_down()
+
+    def display_summary(self):
+        letters: tuple[str, str, str, str] = ("A", "B", "C", "D")
+
+        for question_number, question in enumerate(Users_Questions):
+            self.quiz_summary_box.configure(state="normal")
+
+            self.quiz_summary_box.insert("end", f"{question_number + 1}. {question}\n")
+
+            for letters_index, letter in enumerate(letters):
+                self.quiz_summary_box.insert("end", f"{letter}. {Users_Choices[question_number][letters_index]}\n")
+
+            self.quiz_summary_box.insert("end", f"G --> {Users_Guess[question_number]}\n")
+            self.quiz_summary_box.insert("end", f"CA --> {Users_Answers[question_number]}\n")
+
+            self.quiz_summary_box.insert("end", f"―" * 20 + "\n")
+            self.quiz_summary_box.configure(state="disabled")
