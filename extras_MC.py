@@ -31,19 +31,13 @@ class Make_Questions(ctk.CTkFrame):
                     Users_Questions.append(question)
                     self.questions_textbox.delete(0.0, "end")
 
-            def answers():
-                for answer in users_answers.replace("\n", "").split(", "):
-                    if answer == "A" or answer == "B" or answer == "C" or answer == "D":
-                        Users_Answers.append(answer)
-                        self.answers_textbox.delete(0.0, "end")
+            def return_answer():
+                return users_answers.replace("\n", "").split(", ")
 
-            def choices():
+            def return_choices():
                 for choice in users_choices:
                     one_group_of_choices: list[str] = choice.split(", ")
-
-                    if len(one_group_of_choices) == 4:
-                        Users_Choices.append(one_group_of_choices)
-                        self.choices_textbox.delete(0.0, "end")
+                    return one_group_of_choices
 
             users_questions = self.questions_textbox.get(0.0, "end").splitlines()
             users_answers = self.answers_textbox.get(0.0, "end").upper()
@@ -51,42 +45,50 @@ class Make_Questions(ctk.CTkFrame):
 
             if users_questions != [""] and users_answers != "\n" and users_choices != [""]:  # There is an invisible \n character at the end of every string, and [""] is empty for .splitlines()
 
-                questions()
+                if any(answer not in ["A", "B", "C", "D"] for answer in return_answer()) and len(return_choices()) != 4:
+                    showerror(title="REQUIREMENT NOT MET", message="Check Answers AND Choices.\nChoices can only have 4.\nAnswers must be A, B, C, or D.")
 
-                answers()
+                elif any(answer not in ["A", "B", "C", "D"] for answer in return_answer()) or len(return_choices()) != 4:
+                    showerror(title="REQUIREMENT NOT MET", message="Check Answers OR Choices.\nChoices can only have 4.\nAnswers must be A, B, C, or D.")
 
-                choices()
+                else:
+                    questions()
 
-                print(Users_Questions)
-                print(Users_Answers)
-                print(Users_Choices)
+                    for answer in return_answer():
+                        Users_Answers.append(answer)
+                        self.answers_textbox.delete(0.0, "end")
 
-        def show_preview():  # If there is an existing window, the current window is destroyed then replaced with a new & updated one
+                    for choice in users_choices:
+                        one_group_of_choices: list[str] = choice.split(", ")
+                        Users_Choices.append(one_group_of_choices)
+                        self.choices_textbox.delete(0.0, "end")
+
+        def show_preview():  # if there is an existing window, the current window is destroyed then replaced with a new & updated one
             if self.window_existence:
                 self.preview_window.destroy()
 
             self.preview_window = Preview(self)
             self.window_existence = True
 
-        # Variable
+        # variable
         self.window_existence: bool = False
 
-        # Frame's configuration
+        # frame's configuration
         self.configure(fg_color=("#ebebeb", "#808080"))
         self.place(relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1)
 
-        # WIDGETS
+        # widgets
         self.questions_label = ctk.CTkLabel(
             self,
             text="QUESTIONS",
-            font=("Arial", 25, "bold"),
+            font=("arial", 25, "bold"),
             text_color=("black", "white")
         )
         self.questions_label.place(relx=0.195, rely=0.11, anchor="center")
 
         self.questions_textbox = ctk.CTkTextbox(
             self,
-            font=("Helvetica", 14),
+            font=("helvetica", 14),
             fg_color="white",
             border_color="black",
             border_width=3,
