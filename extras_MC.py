@@ -62,6 +62,9 @@ class Make_Questions(ctk.CTkFrame):
                         one_group_of_choices: list[str] = choice.split(", ")
                         Users_Choices.append(one_group_of_choices)
                         self.choices_textbox.delete(0.0, "end")
+                        
+            else:
+                showerror(title="REQUIREMENT NOT MET", message="All fields must be filled in")
 
         def show_preview():  # if there is an existing window, the current window is destroyed then replaced with a new & updated one
             if self.window_existence:
