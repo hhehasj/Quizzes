@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+from tkinter.messagebox import showerror
 
 # Global Variables
 Users_Questions: list[str] = []
@@ -22,32 +23,36 @@ def get_start_button_pressed():
 class Make_Questions(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent)
+        question_number: int = 0
 
         # Functions
         def stores_and_displays():
-            """"
-            Displays the output of the functions into the preview frame.
-            Then the Question and Answer textboxes will be empty, ready for the next question.
-            """ ""
-
+            nonlocal question_number
             users_questions = store_question()
             users_answers = store_answer()
 
-            for question_num, question in enumerate(users_questions):
-                self.preview_box.configure(state="normal")  # so that text can show in the preview
+            if self.question_textbox.get(1.0, "end") != "\n" and self.answer_textbox.get(1.0, "end") != "\n":
 
-                self.preview_box.insert("end", question + "\n")
-                Users_Questions.append(question)
+                for index, question in enumerate(users_questions):
 
-                self.preview_box.insert("end", f"{users_answers[question_num]}\n")
-                Users_Answers.append(users_answers[question_num])
+                    self.preview_box.configure(state="normal")  # so that text can show in the preview
 
-                self.preview_box.insert("end", "―" * 10 + "\n")
+                    self.preview_box.insert("end", f"{question_number + 1}. {question}\n")
+                    Users_Questions.append(question)
 
-            self.preview_box.configure(state="disabled")  # prevents any external changes to the preview
+                    self.preview_box.insert("end", f"{users_answers[index]}\n")
+                    Users_Answers.append(users_answers[index])
 
-            self.question_textbox.delete(0.0, "end")
-            self.answer_textbox.delete(0.0, "end")
+                    self.preview_box.insert("end", "―" * 15 + "\n")
+                    question_number += 1
+
+                self.preview_box.configure(state="disabled")  # prevents any external changes to the preview
+
+                self.question_textbox.delete(0.0, "end")
+                self.answer_textbox.delete(0.0, "end")
+
+            else:
+                showerror(title="EMPTY FIELDS", message="Fill in all fields.")
 
         def store_question() -> list[str]:
             questions: list[str] = []
@@ -520,6 +525,7 @@ class Summary(ctk.CTkFrame):
     def display_summary(self):
         for question_num, question in enumerate(Users_Questions):
             self.quiz_summary_box.configure(state="normal")
+            self.quiz_summary_box.delete(0.0, "end")
 
             self.quiz_summary_box.insert("end", f"{question_num + 1}. {question}\n")
             self.quiz_summary_box.insert("end", f"G --> {Users_Guess[question_num]}\n")

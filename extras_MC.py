@@ -62,7 +62,7 @@ class Make_Questions(ctk.CTkFrame):
                         one_group_of_choices: list[str] = choice.split(", ")
                         Users_Choices.append(one_group_of_choices)
                         self.choices_textbox.delete(0.0, "end")
-                        
+
             else:
                 showerror(title="REQUIREMENT NOT MET", message="All fields must be filled in")
 
@@ -585,6 +585,7 @@ class Summary(ctk.CTkFrame):
 
         for question_number, question in enumerate(Users_Questions):
             self.quiz_summary_box.configure(state="normal")
+            self.quiz_summary_box.delete(0.0, "end")
 
             self.quiz_summary_box.insert("end", f"{question_number + 1}. {question}\n")
 

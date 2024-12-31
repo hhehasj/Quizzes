@@ -46,7 +46,7 @@ class Make_Statements(ctk.CTkFrame):
                     self.preview_box.insert("end", f"{statement_num + 1}. {statement}\n")
 
                     self.preview_box.insert("end", f"{statement_num + 1}. {final_statements[index]}\n")
-                    User_Statements.append(final_statements[statement_num])
+                    User_Statements.append(final_statements[index])
 
                     self.preview_box.insert("end", "―" * 15 + "\n")
                     statement_num += 1
@@ -73,13 +73,17 @@ class Make_Statements(ctk.CTkFrame):
             displayed_statements: list[str] = []
 
             for index, statement in enumerate(revised_initial_statement):
-                if statement.find(revised_chosen_word[index]) != -1:
-                    final_statements.append(statement.replace(revised_chosen_word[index], "_" * len(revised_chosen_word[index])))
-                    displayed_statements.append(statement)
-                    Users_Answers.append(revised_chosen_word[index])
+                try:
+                    if statement.find(revised_chosen_word[index]) != -1:
+                            final_statements.append(statement.replace(revised_chosen_word[index], "_" * len(revised_chosen_word[index])))
+                            displayed_statements.append(statement)
+                            Users_Answers.append(revised_chosen_word[index])
 
-                else:
-                    showerror(title="Error", message="The word you want to turn into a blank is not in the statement.")
+                    else:
+                        showerror(title="ERROR", message="The words you want to turn into blanks is not complete")
+
+                except IndexError:
+                    showerror(title="REQUIREMENT NOT MET", message="The word you want to turn into a blank is not in the statement.")
 
             if len(final_statements) != len(revised_initial_statement):  # so that a statement will not sneak pass through.
                 final_statements.clear()
@@ -532,6 +536,7 @@ class Summary(ctk.CTkFrame):
     def display_summary(self):
         for question_num, question in enumerate(User_Statements):
             self.quiz_summary_box.configure(state="normal")
+            self.quiz_summary_box.delete(0.0, "end")
 
             self.quiz_summary_box.insert("end", f"{question_num + 1}. {question}\n")
             self.quiz_summary_box.insert("end", f"G --> {Users_Guess[question_num]}\n")
